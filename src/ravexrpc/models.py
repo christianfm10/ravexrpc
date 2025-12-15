@@ -233,3 +233,70 @@ class RPCGetBalanceResult(APIBaseModel):
     """
 
     value: int
+
+
+# -----------------------------------GetTokenAccountsByOwner Models-----------------------------------#
+
+
+class RPCContext(APIBaseModel):
+    """Contexto devuelto por algunas respuestas RPC (slot, apiVersion)."""
+
+    slot: int
+    apiVersion: str | None = None
+
+
+class RPCTokenAmount(APIBaseModel):
+    """Modelo para tokenAmount dentro del parsed info."""
+
+    amount: str
+    decimals: int | None = None
+    uiAmount: float | None = None
+    uiAmountString: str | None = None
+
+
+class RPCParsedInfo(APIBaseModel):
+    """Información parseada del account.data.parsed."""
+
+    isNative: bool | None = None
+    mint: str | None = None
+    owner: str | None = None
+    state: str | None = None
+    tokenAmount: RPCTokenAmount | None = None
+
+
+class RPCDataParsed(APIBaseModel):
+    """Estructura de account.data cuando el program es spl-token y está parsed."""
+
+    program: str
+    parsed: dict | None = None
+    space: int | None = None
+
+
+class RPCAccountInner(APIBaseModel):
+    """Modelo para el campo `account` dentro del valor del response."""
+
+    lamports: int
+    data: dict
+    owner: str
+    executable: bool
+    rentEpoch: int
+    space: int | None = None
+
+
+class RPCValueItem(APIBaseModel):
+    """Item individual en la lista `value` de la respuesta getTokenAccountsByOwner."""
+
+    pubkey: str
+    account: RPCAccountInner
+
+
+class RPCGetTokenAccountsByOwnerResult(APIBaseModel):
+    """Resultado del método getTokenAccountsByOwner.
+
+    Attributes:
+        context: Información de contexto (slot, apiVersion)
+        value: Lista de cuentas encontradas (pubkey + account)
+    """
+
+    context: RPCContext
+    value: list[RPCValueItem]

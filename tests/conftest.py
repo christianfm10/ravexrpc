@@ -76,3 +76,44 @@ def sample_rpc_error():
             "message": "Invalid params: invalid owner address",
         }
     }
+
+
+@pytest.fixture
+def sample_get_token_accounts_by_owner_response():
+    """Fixture con respuesta de ejemplo para getTokenAccountsByOwner."""
+    return {
+        "result": {
+            "context": {"slot": 386954899, "apiVersion": "2.2.7"},
+            "value": [
+                {
+                    "pubkey": "3ACMdmqTvCqM6oxSqhoTauVu7VN6oogNaek7NPYmKtTk",
+                    "account": {
+                        "lamports": 2039280,
+                        "data": {
+                            "program": "spl-token",
+                            "parsed": {
+                                "info": {
+                                    "isNative": False,
+                                    "mint": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+                                    "owner": "DjQqV6xj8o9sKWbYYqfSXhEBUDsCdTgGwzo3wuvJgDHn",
+                                    "state": "initialized",
+                                    "tokenAmount": {
+                                        "amount": "1382722336",
+                                        "decimals": 5,
+                                        "uiAmount": 13827.22336,
+                                        "uiAmountString": "13827.22336",
+                                    },
+                                },
+                                "type": "account",
+                            },
+                            "space": 165,
+                        },
+                        "owner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+                        "executable": False,
+                        "rentEpoch": 18446744073709551615,
+                        "space": 165,
+                    },
+                }
+            ],
+        }
+    }

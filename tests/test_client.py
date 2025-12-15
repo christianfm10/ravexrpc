@@ -231,3 +231,72 @@ class TestGetBalance:
         params = call_args[1]["payload"]["params"]
         assert params[0] == "Dxu2pZyqC1YZxq5bskfDCz2gDPXPGJDQTxjJ4RPVCpnV"
         assert params[1]["commitment"] == "confirmed"
+
+    class TestGetTokenAccountsByOwner:
+        """Tests para el método get_token_accounts_by_owner."""
+
+        @pytest.mark.asyncio
+        async def test_get_token_accounts_by_owner_success(
+            self, mock_client, sample_get_token_accounts_by_owner_response
+        ):
+            """Test exitoso de get_token_accounts_by_owner."""
+            mock_client._fetch.return_value = (
+                sample_get_token_accounts_by_owner_response
+            )
+
+            result = await mock_client.get_token_accounts_by_owner(
+                owner="DjQqV6xj8o9sKWbYYqfSXhEBUDsCdTgGwzo3wuvJgDHn",
+                mint="DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+                commitment="confirmed",
+                encoding="jsonParsed",
+            )
+
+            assert result.context.slot == 386954899
+            assert len(result.value) == 1
+            assert (
+                result.value[0].pubkey == "3ACMdmqTvCqM6oxSqhoTauVu7VN6oogNaek7NPYmKtTk"
+            )
+
+        @pytest.mark.asyncio
+        async def test_get_token_accounts_by_owner_invalid_owner(self, mock_client):
+            """Owner inválido debe lanzar ValueError."""
+            with pytest.raises(ValueError, match="cadena válida"):
+                await mock_client.get_token_accounts_by_owner(owner="")
+
+        @pytest.mark.asyncio
+        async def test_get_token_accounts_by_owner_rpc_error(
+            self, mock_client, sample_rpc_error
+        ):
+            """Error RPC debe lanzar RPCException."""
+            mock_client._fetch.return_value = sample_rpc_error
+
+            with pytest.raises(RPCException, match="Error RPC"):
+                await mock_client.get_token_accounts_by_owner(
+                    owner="DjQqV6xj8o9sKWbYYqfSXhEBUDsCdTgGwzo3wuvJgDHn",
+                    mint="DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+                )
+
+        @pytest.mark.asyncio
+        async def test_get_token_accounts_by_owner_payload_structure(
+            self, mock_client, sample_get_token_accounts_by_owner_response
+        ):
+            """Verifica que el payload incluye filter y options correctamente."""
+            mock_client._fetch.return_value = (
+                sample_get_token_accounts_by_owner_response
+            )
+
+            await mock_client.get_token_accounts_by_owner(
+                owner="DjQqV6xj8o9sKWbYYqfSXhEBUDsCdTgGwzo3wuvJgDHn",
+                mint="DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+                commitment="confirmed",
+                encoding="jsonParsed",
+            )
+
+            call_args = mock_client._fetch.call_args
+            payload = call_args[1]["payload"]
+            assert payload["method"] == "getTokenAccountsByOwner"
+            params = payload["params"]
+            assert params[0] == "DjQqV6xj8o9sKWbYYqfSXhEBUDsCdTgGwzo3wuvJgDHn"
+            assert params[1]["mint"] == "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263"
+            assert params[2]["commitment"] == "confirmed"
+            assert params[2]["encoding"] == "jsonParsed"

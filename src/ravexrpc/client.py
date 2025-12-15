@@ -7,6 +7,7 @@ from ravexclient import BaseClient
 from ravexrpc.exceptions import RPCException
 from ravexrpc.models import (
     RPCGetBalanceResult,
+    RPCGetTokenAccountsByOwnerResult,
     RPCGetTokenAccountsResult,
     RPCGetTransactionResult,
 )
@@ -209,6 +210,56 @@ class RPC_Client(BaseClient):
             from_pk=from_pk,
             to_pk=to_pk,
         )
+
+    async def get_token_accounts_by_owner(
+        self,
+        owner: str,
+        mint: str | None = None,
+        commitment: CommitmentLevel = "finalized",
+        encoding: EncodingType = "jsonParsed",
+    ) -> RPCGetTokenAccountsByOwnerResult:
+        """Consulta `getTokenAccountsByOwner` del RPC de Solana.
+
+        Construye el payload en formato de lista de parámetros que acepta
+        el endpoint y retorna un modelo tipado con la respuesta.
+
+        Args:
+            owner: Dirección del owner (base58).
+            mint: Mint del token para filtrar (opcional).
+            commitment: Nivel de confirmación (processed|confirmed|finalized).
+            encoding: Encoding de la respuesta (jsonParsed|json|base58|base64).
+
+        Returns:
+            RPCGetTokenAccountsByOwnerResult con `context` y `value` (lista de cuentas).
+
+        Raises:
+            ValueError: Si `owner` no es válido.
+            RPCException: Si el RPC responde con error.
+        """
+        if not owner or not isinstance(owner, str):
+            raise ValueError("La dirección del owner debe ser una cadena válida")
+
+        method = "getTokenAccountsByOwner"
+
+        # Parametros: [owner, filterObject, options]
+        filter_obj = {"mint": mint} if mint is not None else {}
+        options = {"commitment": commitment, "encoding": encoding}
+        params = [owner, filter_obj or {}, options]
+
+        payload = {
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": method,
+            "params": params,
+        }
+
+        result = await self._fetch("POST", payload=payload)
+
+        if "error" in result:
+            error_msg = result["error"].get("message", "Error desconocido")
+            raise RPCException(f"Error RPC: {error_msg}")
+
+        return RPCGetTokenAccountsByOwnerResult(**result["result"])
 
     async def get_balance(
         self,

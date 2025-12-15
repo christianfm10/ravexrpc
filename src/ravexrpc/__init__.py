@@ -26,6 +26,8 @@ from ravexrpc.exceptions import (
     TransactionNotFoundException,
 )
 from ravexrpc.models import (
+    RPCGetBalanceResult,
+    RPCGetTokenAccountsByOwnerResult,
     RPCGetTokenAccountsResult,
     RPCGetTransactionResult,
     RPCMessageModel,
@@ -48,6 +50,8 @@ __all__ = [
     "RPCConnectionException",
     # Modelos de respuesta
     "RPCGetTokenAccountsResult",
+    "RPCGetTokenAccountsByOwnerResult",
+    "RPCGetBalanceResult",
     "RPCGetTransactionResult",
     "RPCTokenAccounts",
     "RPCMetaTransaction",
