@@ -108,6 +108,8 @@ class RPCMetaTransaction(APIBaseModel):
 
     post_balances: list[int] = Field(..., alias="postBalances")
     pre_balances: list[int] = Field(..., alias="preBalances")
+    pre_token_balances: list[dict] = Field(..., alias="preTokenBalances")
+    post_token_balances: list[dict] = Field(..., alias="postTokenBalances")
     delta_balances: list[int] = Field(default_factory=list)
 
     @model_validator(mode="after")
@@ -173,6 +175,15 @@ class RPCGetTransactionResult(APIBaseModel):
     from_pk: str | None = None
     sol_amount: float | None = None
     send_sol_amount: float | None = None
+    buyed_tokens_amount: int | None = None
+
+    @model_validator(mode="after")
+    def set_buyed_tokens(self) -> RPCGetTransactionResult:
+        if self.meta.post_token_balances:
+            for x in self.meta.post_token_balances:
+                if x["owner"] == self.to_pk:
+                    self.buyed_tokens_amount = x["uiTokenAmount"]["amount"]
+        return self
 
     @model_validator(mode="after")
     def calculate_sol_amounts(self) -> RPCGetTransactionResult:
