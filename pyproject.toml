@@ -1,6 +1,6 @@
 [project]
 name = "ravexrpc"
-version = "0.1.0"
+version = "0.2.0"
 description = "Cliente asíncrono para interactuar con el RPC de Solana"
 readme = "README.md"
 authors = [{ name = "Christian Flores", email = "christianmfm10@gmail.com" }]
